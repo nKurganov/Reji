@@ -658,6 +658,7 @@
 
   <script>
     const STORAGE_KEY = 'quiz8marta';
+    const TEST_BAN_SECONDS = 10;
 
     const questions = [
       { question: "Подпольное прозвище у Олеськи?", answer: ["Сосо", "Coco", "сосо"], image: "soso.jpg" },
@@ -911,7 +912,7 @@
     }
 
     function applyBan(banMinutes) {
-      const banMs = banMinutes * 60 * 1000;
+      const banMs = (TEST_BAN_SECONDS != null ? TEST_BAN_SECONDS : banMinutes * 60) * 1000;
       banEndTime = Date.now() + banMs;
 
       answerInput.disabled = true;
