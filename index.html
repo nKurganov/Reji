@@ -649,7 +649,7 @@
       <div class="congrats-content">
         <div class="congrats-emoji">🎉🌸💝</div>
         <h2 class="congrats-title">Дорогая, с праздником тебя!</h2>
-        <a href="https://ga.gift/ru/5ea2bf4e05db47b6ae7cb6880b3cdc5f" class="gift-link" id="giftLink" target="_blank" rel="noopener">
+        <a href="https://ya.ru/" class="gift-link" id="giftLink" target="_blank" rel="noopener">
           🎁 Получить подарок
         </a>
       </div>
@@ -768,7 +768,22 @@
     }
 
     function normalizeAnswer(str) {
-      return str.trim().toLowerCase().replace(/\s+/g, ' ');
+      let s = str.trim().toLowerCase().replace(/\s+/g, ' ');
+      s = replaceLatinHomoglyphs(s);
+      return s;
+    }
+
+    function replaceLatinHomoglyphs(str) {
+      const latToCyr = {
+        'a': '\u0430', 'c': '\u0441', 'e': '\u0435', 'o': '\u043e', 'p': '\u0440',
+        'x': '\u0445', 'y': '\u0443', 'ё': '\u0435'
+      };
+      let result = '';
+      for (let i = 0; i < str.length; i++) {
+        const c = str[i];
+        result += latToCyr[c] !== undefined ? latToCyr[c] : c;
+      }
+      return result;
     }
 
     function isAnswerCorrect(userAnswer, q) {
@@ -1035,4 +1050,3 @@
   </script>
 </body>
 </html>
-
