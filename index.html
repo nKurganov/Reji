@@ -1,0 +1,1037 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <title>Регина — викторина к 8 марта 🌸</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Nunito+Sans:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --rose: #ffb6c1;
+      --lavender: #e6e6fa;
+      --peach: #ffdab9;
+      --mint: #f0fff0;
+      --white: #fffef9;
+      --text: #5c4a4a;
+      --shadow: rgba(92, 74, 74, 0.15);
+      --font-heading: 'Nunito', -apple-system, sans-serif;
+      --font-body: 'Nunito Sans', -apple-system, sans-serif;
+    }
+
+    body {
+      font-family: var(--font-body);
+      font-weight: 400;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      min-height: 100vh;
+      min-height: 100dvh;
+      background: linear-gradient(135deg, var(--lavender) 0%, var(--rose) 40%, var(--peach) 100%);
+      background-attachment: fixed;
+      color: var(--text);
+      overflow-x: hidden;
+      padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+    }
+
+    body::before {
+      content: '🌸 🌷 🌺 🌸 🌷 🌺';
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      font-size: 1.2rem;
+      letter-spacing: 0.5rem;
+      opacity: 0.4;
+      text-align: center;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .container {
+      max-width: 480px;
+      margin: 0 auto;
+      padding: 1.5rem;
+      padding-top: max(1.5rem, env(safe-area-inset-top));
+      position: relative;
+      z-index: 1;
+    }
+
+    .quiz-screen {
+      min-height: 80vh;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      animation: fadeIn 0.4s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .quiz-header {
+      text-align: center;
+    }
+
+    .greeting {
+      font-family: var(--font-heading);
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: #c71585;
+      margin-bottom: 0.25rem;
+      letter-spacing: -0.02em;
+    }
+
+    .quiz-header h1 {
+      font-family: var(--font-heading);
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: var(--text);
+      margin-bottom: 0.35rem;
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+    }
+
+    .subtitle {
+      font-size: 1rem;
+      font-weight: 400;
+      color: var(--text);
+      opacity: 0.9;
+      margin-bottom: 0.5rem;
+      line-height: 1.45;
+    }
+
+    .quiz-counter {
+      font-family: var(--font-heading);
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: var(--text);
+      opacity: 0.9;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 10px;
+      background: rgba(255, 255, 255, 0.5);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--rose), #ff69b4);
+      border-radius: 999px;
+      transition: width 0.4s ease;
+    }
+
+    .question-card {
+      background: rgba(255, 254, 249, 0.92);
+      border-radius: 24px;
+      padding: 1.75rem;
+      box-shadow: 0 10px 40px var(--shadow);
+      backdrop-filter: blur(12px);
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      animation: fadeIn 0.4s ease-out;
+    }
+
+    .question-image-wrap {
+      position: relative;
+      max-width: 280px;
+      margin: 0 auto 1rem;
+      min-height: 120px;
+    }
+
+    .question-image-wrap.hidden {
+      display: none;
+    }
+
+    .question-image-loader {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.75rem;
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 16px;
+      font-size: 0.9rem;
+      color: var(--text);
+    }
+
+    .question-image-loader.hidden {
+      display: none;
+    }
+
+    .question-image-loader::before {
+      content: '';
+      width: 28px;
+      height: 28px;
+      border: 3px solid rgba(255, 182, 193, 0.5);
+      border-top-color: var(--rose);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    .question-image-loader-text {
+      font-size: 0.85rem;
+      opacity: 0.9;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .question-image {
+      width: 100%;
+      height: auto;
+      border-radius: 16px;
+      display: block;
+      box-shadow: 0 4px 20px var(--shadow);
+    }
+
+    .question-image.hidden {
+      display: none;
+    }
+
+    .question-text {
+      font-family: var(--font-body);
+      font-size: 1.25rem;
+      line-height: 1.55;
+      font-weight: 600;
+      text-align: center;
+      margin-bottom: 1.5rem;
+      letter-spacing: 0.01em;
+    }
+
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .options-container {
+      display: none;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .options-container.visible {
+      display: flex;
+    }
+
+    .option-btn {
+      font-family: var(--font-body);
+      padding: 1rem 1.25rem;
+      font-size: 1.05rem;
+      font-weight: 500;
+      text-align: center;
+      color: var(--text);
+      background: white;
+      border: 2px solid rgba(255, 182, 193, 0.6);
+      border-radius: 14px;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s, transform 0.2s;
+    }
+
+    .option-btn:hover:not(:disabled) {
+      border-color: var(--rose);
+      background: rgba(255, 182, 193, 0.15);
+    }
+
+    .option-btn:active:not(:disabled) {
+      transform: scale(0.98);
+    }
+
+    .option-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .option-feedback {
+      display: none;
+      flex-direction: column;
+      gap: 1rem;
+      margin-top: 0.5rem;
+    }
+
+    .option-feedback.visible {
+      display: flex;
+      animation: fadeIn 0.3s ease-out;
+    }
+
+    .option-feedback-correct {
+      font-family: var(--font-heading);
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: #2e7d32;
+      text-align: center;
+    }
+
+    .option-feedback-explanation {
+      font-size: 0.95rem;
+      line-height: 1.5;
+      color: var(--text);
+      padding: 1rem;
+      background: rgba(255, 255, 255, 0.7);
+      border-radius: 12px;
+    }
+
+    .option-continue-btn {
+      font-family: var(--font-heading);
+      padding: 0.9rem 1.5rem;
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: white;
+      background: linear-gradient(135deg, #ff69b4, #ffb6c1);
+      border: none;
+      border-radius: 14px;
+      cursor: pointer;
+      box-shadow: 0 4px 16px rgba(255, 105, 180, 0.4);
+      transition: transform 0.2s, box-shadow 0.2s;
+      align-self: center;
+    }
+
+    .option-continue-btn:active {
+      transform: scale(0.98);
+    }
+
+    .answer-input {
+      font-family: var(--font-body);
+      width: 100%;
+      padding: 1rem 1.25rem;
+      font-size: 1.1rem;
+      font-weight: 400;
+      border: 2px solid rgba(255, 182, 193, 0.6);
+      border-radius: 14px;
+      background: white;
+      color: var(--text);
+      transition: border-color 0.2s, opacity 0.2s;
+    }
+
+    .answer-input:focus {
+      outline: none;
+      border-color: var(--rose);
+      box-shadow: 0 0 0 3px rgba(255, 182, 193, 0.3);
+    }
+
+    .answer-input:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      background: #f5f5f5;
+    }
+
+    .submit-btn {
+      font-family: var(--font-heading);
+      padding: 1rem 2rem;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: white;
+      background: linear-gradient(135deg, #ff69b4, #ffb6c1);
+      border: none;
+      border-radius: 14px;
+      cursor: pointer;
+      box-shadow: 0 4px 16px rgba(255, 105, 180, 0.4);
+      transition: transform 0.2s, opacity 0.2s, box-shadow 0.2s;
+      letter-spacing: 0.02em;
+    }
+
+    .submit-btn:active:not(:disabled) {
+      transform: scale(0.98);
+    }
+
+    .submit-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .ban-timer {
+      font-family: var(--font-body);
+      display: none;
+      text-align: center;
+      padding: 1rem;
+      background: rgba(255, 255, 255, 0.7);
+      border-radius: 14px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #c71585;
+    }
+
+    .ban-timer.visible {
+      display: block;
+      animation: fadeIn 0.3s ease-out;
+    }
+
+    .start-screen {
+      min-height: 80vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 2rem;
+      animation: fadeIn 0.5s ease-out;
+    }
+
+    .start-screen.hidden {
+      display: none;
+    }
+
+    .start-content {
+      background: rgba(255, 254, 249, 0.96);
+      border-radius: 28px;
+      padding: 2.5rem;
+      box-shadow: 0 16px 48px var(--shadow);
+      max-width: 400px;
+    }
+
+    .start-content .start-emoji {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+
+    .start-content h2 {
+      font-family: var(--font-heading);
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: var(--text);
+      margin-bottom: 1rem;
+      letter-spacing: -0.02em;
+      line-height: 1.25;
+    }
+
+    .start-content p {
+      font-size: 1.05rem;
+      line-height: 1.55;
+      color: var(--text);
+      margin-bottom: 1.5rem;
+    }
+
+    .start-btn {
+      font-family: var(--font-heading);
+      display: inline-block;
+      padding: 1rem 2rem;
+      font-size: 1.1rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      color: white;
+      background: linear-gradient(135deg, #ff69b4, #ffb6c1);
+      border: none;
+      border-radius: 14px;
+      cursor: pointer;
+      box-shadow: 0 4px 20px rgba(255, 105, 180, 0.4);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .start-btn:hover {
+      transform: scale(1.03);
+      box-shadow: 0 6px 24px rgba(255, 105, 180, 0.5);
+    }
+
+    .start-btn:active {
+      transform: scale(0.98);
+    }
+
+    .start-step {
+      display: none;
+    }
+
+    .start-step.visible {
+      display: block;
+      animation: fadeIn 0.4s ease-out;
+    }
+
+    .congrats-screen {
+      display: none;
+      min-height: 80vh;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 2rem;
+      animation: fadeIn 0.6s ease-out;
+    }
+
+    .congrats-screen.visible {
+      display: flex;
+    }
+
+    .congrats-content {
+      background: rgba(255, 254, 249, 0.96);
+      border-radius: 28px;
+      padding: 2.5rem;
+      box-shadow: 0 16px 48px var(--shadow);
+      max-width: 400px;
+    }
+
+    .congrats-emoji {
+      font-size: 4rem;
+      margin-bottom: 1rem;
+      animation: bounce 1s ease infinite;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    .congrats-title {
+      font-family: var(--font-heading);
+      font-size: 1.85rem;
+      font-weight: 800;
+      color: var(--text);
+      margin-bottom: 1rem;
+      letter-spacing: -0.02em;
+      line-height: 1.25;
+    }
+
+    .congrats-text {
+      font-size: 1.1rem;
+      line-height: 1.6;
+      margin-bottom: 1.5rem;
+      color: var(--text);
+    }
+
+    .gift-link {
+      font-family: var(--font-heading);
+      display: inline-block;
+      padding: 1rem 2rem;
+      font-size: 1.1rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      color: white;
+      background: linear-gradient(135deg, #ff69b4, #ffb6c1);
+      border-radius: 14px;
+      text-decoration: none;
+      box-shadow: 0 4px 20px rgba(255, 105, 180, 0.4);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .gift-link:hover {
+      transform: scale(1.03);
+      box-shadow: 0 6px 24px rgba(255, 105, 180, 0.5);
+    }
+
+    .gift-link:active {
+      transform: scale(0.98);
+    }
+
+    .confetti {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1000;
+      overflow: hidden;
+    }
+
+    .confetti-piece {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      border-radius: 2px;
+      animation: confettiFall 3s ease-in-out forwards;
+    }
+
+    @keyframes confettiFall {
+      0% {
+        transform: translateY(-100vh) rotate(0deg);
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(100vh) rotate(720deg);
+        opacity: 0;
+      }
+    }
+
+    @media (max-width: 428px) {
+      .container {
+        padding: 1rem;
+      }
+
+      .question-text {
+        font-size: 1.15rem;
+      }
+
+      .answer-input,
+      .submit-btn {
+        padding: 0.9rem 1.25rem;
+        font-size: 1rem;
+      }
+    }
+
+    @media (min-width: 380px) {
+      .quiz-header h1 {
+        font-size: 1.75rem;
+      }
+
+      .start-content h2 {
+        font-size: 1.75rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="start-screen" id="startScreen">
+      <div class="start-content">
+        <div class="start-step visible" id="startStep1">
+          <div class="start-emoji">🌸💐🌷</div>
+          <h2>Реджи, с 8 марта!</h2>
+          <button class="start-btn" id="giftBtn">🎁 Получить подарок</button>
+        </div>
+        <div class="start-step" id="startStep2">
+          <div class="start-emoji">😏✨</div>
+          <h2>Не так быстро, хитрюга!</h2>
+          <p>Подарки так просто не достаются.</p>
+          <button class="start-btn" id="quizStartBtn">Ответь на несколько вопросов</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="quiz-screen" id="quizScreen" style="display: none;">
+      <div class="quiz-header">
+        <p class="greeting">Регина, с 8 марта! 💐</p>
+        <p class="subtitle">Ответь на вопросики</p>
+        <div class="quiz-counter" id="quizCounter">❤️ Вопрос 1/<span id="totalQuestions">10</span></div>
+      </div>
+
+      <div class="progress-bar">
+        <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+      </div>
+
+      <div class="question-card">
+        <div class="question-image-wrap hidden" id="questionImageWrap">
+          <div class="question-image-loader" id="questionImageLoader"><span class="question-image-loader-text">Загрузка фото…</span></div>
+          <img class="question-image" id="questionImage" src="" alt="" decoding="async">
+        </div>
+        <p class="question-text" id="questionText"></p>
+        <div class="input-group" id="inputGroup">
+          <input
+            type="text"
+            class="answer-input"
+            id="answerInput"
+            placeholder="Введите ответ..."
+            autocomplete="off"
+            autofocus
+          />
+          <button class="submit-btn" id="submitBtn">Ответить</button>
+        </div>
+        <div class="options-container" id="optionsContainer"></div>
+        <div class="option-feedback" id="optionFeedback">
+          <p class="option-feedback-correct">Правильно!</p>
+          <p class="option-feedback-explanation" id="optionExplanation"></p>
+          <button type="button" class="option-continue-btn" id="optionContinueBtn">Продолжить</button>
+        </div>
+        <div class="ban-timer" id="banTimer">
+          💔 Пффф... Неверно. Следующая попытка через <span id="banTime">00:00</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="congrats-screen" id="congratsScreen">
+      <div class="confetti" id="confetti"></div>
+      <div class="congrats-content">
+        <div class="congrats-emoji">🎉🌸💝</div>
+        <h2 class="congrats-title">Дорогая, с праздником тебя!</h2>
+        <a href="https://ya.ru/" class="gift-link" id="giftLink" target="_blank" rel="noopener">
+          🎁 Получить подарок
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const STORAGE_KEY = 'quiz8marta';
+
+    const questions = [
+      { question: "Подпольное прозвище у Олеськи?", answer: ["Сосо", "Coco", "сосо"], image: "soso.jpg" },
+      {
+        question: "Какой продукт, по оценкам историков, иногда использовали как плату в Древнем Риме, что стало основой для одного современного слова?",
+        answer: "Соль",
+        options: ["Чеснок", "Мёд", "Соль", "Шоколад"],
+        explanation: "В Древнем Риме в качестве платежного средства иногда использовали соль (salarium — её выдавали солдатам в виде жалованья). Это стало основой слова salary (зарплата)."
+      },
+      { question: "Как зовут эту засранку?", answer: "Найда", image: "zasranka.jpg" },
+      {
+        question: "Почему фламинго в природе чаще всего стоят на одной ноге?",
+        answer: "Так они экономят тепло и энергию",
+        options: ["Так им удобнее спать лёжа", "Так они экономят тепло и энергию", "Так они лучше маскируются от хищников", "Так им проще переваривать пищу"],
+        explanation: "Фламинго в природе чаще всего стоят на одной ноге из-за пассивного гравитационного опорного механизма, который позволяет им сохранять равновесие без мышечных усилий — это экономит энергию и помогает отдыхать (даже спящими они так стоят)."
+      },
+      { question: "Отчество моей мамы?", answer: ["Александровна", "Aleksandrovna"], image: "mama.jpg" },
+      {
+        question: "Почему улитки могут «засыпать» сразу на несколько лет подряд в неблагоприятных условиях?",
+        answer: "Так они экономят влагу и энергию",
+        options: ["Так они избегают хищников, пока маленькие", "Так они быстрее растут", "Им просто очень нравится спать", "Так они экономят влагу и энергию"],
+        explanation: "Улитки могут «засыпать» на несколько лет (до 3 лет) в неблагоприятных условиях благодаря эстивации (летней спячке) — защитному механизму от засухи, жары или холода. Они запечатывают раковину специальной эпипрагмой (плёнкой из высохшей слизи), которая сохраняет влагу внутри, и резко замедляют метаболизм, потребляя накопленные ранее питательные вещества. Это позволяет им выживать без еды и воды, пока условия не улучшатся."
+      },
+      { question: "Имя этого красавца ты точно должна помнить?", answer: ["Лёлик", "Лелик"], image: "lelik.jpg" },
+      {
+        question: "У учёного есть кот, которого он называет «квантовый». Почему он так делает?",
+        answer: "Потому что состояние кота он описывает вероятностями, а не уверенностью",
+        options: ["Потому что кот одновременно и пушистый, и непушистый", "Потому что состояние кота он описывает вероятностями, а не уверенностью", "Потому что кот исчезает, как только на него смотрят", "Потому что кот всегда мяукает строго через каждые 10 секунд"],
+        explanation: "Учёный называет кота «квантовым» по аналогии с мысленным экспериментом Эрвина Шрёдингера, где кот одновременно жив и мёртв, пока коробка не открыта (суперпозиция состояний в квантовой механике). Это отсылка к знаменитому парадоксу, иллюстрирующему квантовые эффекты на макроуровне."
+      },
+      { question: "Название рыбы которой тебя угостили в Вишерском заповеднике?", answer: "Хариус", image: "harius.jpg" },
+      {
+        question: "Какой привычкой отличался Лев Толстой в зрелые годы, когда работал над своими произведениями?",
+        answer: "Он диктовал тексты, ходя по комнате босиком и в простом крестьянском кафтане",
+        options: ["Он переписывал тексты от руки по нескольку раз, сознательно избегая печатной машинки", "Он диктовал тексты, ходя по комнате босиком и в простом крестьянском кафтане", "Он писал исключительно на стенах и потом переносил текст на бумагу учениками", "Он писал только ночью при свечах, полностью запрещая себе дневной свет"],
+        explanation: "Толстой действительно был известен тем, что во многих ситуациях предпочитал простую одежду, а также любил ходить босиком, но он не диктовал тексты, стоя неподвижно или сидя за столом; ключевой особенностью было именно хождение по комнате в момент диктовки.\n\nThe correct answer is: Он диктовал тексты, ходя по комнате босиком и в простом крестьянском кафтане. Такое сочетание движения, простоты одежды и устной речи создаёт очень наглядный образ его творческого процесса. Толстой словно прогуливался по своим мыслям, разворачивая их в длительные фразы, а члены семьи служили своеобразной «живой машинкой», поспевая за его темпом диктовки. Эта привычка также показывает, как тесно творчество переплетено с повседневностью: домашний быт, семейные отношения и литературный труд у Толстого почти не разделялись, превращая его рабочий день в совместное дело с близкими."
+      },
+      { question: "Где я буду в августе 2026г?", answer: ["Тулым", "Тулим", "Tulym", "Tulim"], image: "tulim.jpg" },
+      {
+        question: "Что из перечисленного является реальным курьёзом из жизни Альберта Эйнштейна?",
+        answer: "Он принципиально отказывался носить носки и иногда приходил без них даже на официальные мероприятия",
+        options: ["Он боялся всех механизмов и даже избегал пользоваться велосипедом", "Он написал первый научный труд ещё в детском саду, не умея толком читать", "Он принципиально отказывался носить носки и иногда приходил без них даже на официальные мероприятия", "Он настаивал, чтобы в его доме не было ни одной книги, чтобы «не засорять голову чужими мыслями»"],
+        explanation: "Эйнштейн действительно был известен своей небрежностью к одежде, но распространённый миф о полном страхе перед техникой не имеет надёжных оснований: он любил прогулки, в том числе на велосипеде, и не демонстрировал иррациональной боязни механизмов.\n\nThe correct answer is: Он принципиально отказывался носить носки и иногда приходил без них даже на официальные мероприятия. Эйнштейн сам шутливо объяснял, что носки быстро протираются, а туфли и так скрывают ноги, поэтому он не видел в них смысла. Современники вспоминали, что он мог появиться без носков на приёмах и лекциях, что производило забавно-эксцентричное впечатление. Эта деталь показывает, как он относился к условностям: ему было гораздо важнее думать о науке, чем соответствовать дресс-коду. Такой курьёз помогает увидеть в великом учёном живого человека, который позволял себе маленькие бытовые бунты против социальных ожиданий."
+      },
+      { question: "Как мы назовём нашего сына?", answer: ["Артём", "Артем"], image: "cin.jpg" },
+    ];
+
+    let currentIndex = 0;
+    let errorCount = 0;
+    let banTimerInterval = null;
+    let banEndTime = null;
+
+    const quizScreen = document.getElementById('quizScreen');
+    const congratsScreen = document.getElementById('congratsScreen');
+    const questionText = document.getElementById('questionText');
+    const answerInput = document.getElementById('answerInput');
+    const submitBtn = document.getElementById('submitBtn');
+    const quizCounter = document.getElementById('quizCounter');
+    const totalQuestionsEl = document.getElementById('totalQuestions');
+    const progressFill = document.getElementById('progressFill');
+    const banTimer = document.getElementById('banTimer');
+    const banTimeEl = document.getElementById('banTime');
+    const giftLink = document.getElementById('giftLink');
+    const questionImageWrap = document.getElementById('questionImageWrap');
+    const questionImageLoader = document.getElementById('questionImageLoader');
+    const questionImage = document.getElementById('questionImage');
+    const inputGroup = document.getElementById('inputGroup');
+    const optionsContainer = document.getElementById('optionsContainer');
+    const optionFeedback = document.getElementById('optionFeedback');
+    const optionExplanation = document.getElementById('optionExplanation');
+    const optionContinueBtn = document.getElementById('optionContinueBtn');
+
+    totalQuestionsEl.textContent = questions.length;
+
+    function saveState() {
+      try {
+        const state = {
+          introPassed: true,
+          currentIndex,
+          errorCount,
+          banEndTime: banEndTime || null,
+          completed: congratsScreen.classList.contains('visible')
+        };
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      } catch (e) {}
+    }
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return false;
+        const state = JSON.parse(raw);
+        if (state.completed) return state;
+        if (state.introPassed) {
+          currentIndex = Math.min(Math.max(0, state.currentIndex || 0), questions.length - 1);
+          errorCount = Math.max(0, state.errorCount || 0);
+          const savedBanEnd = state.banEndTime;
+          if (savedBanEnd && savedBanEnd > Date.now()) {
+            banEndTime = savedBanEnd;
+          } else {
+            banEndTime = null;
+          }
+        }
+        return state;
+      } catch (e) {
+        return false;
+      }
+    }
+
+    function normalizeAnswer(str) {
+      return str.trim().toLowerCase().replace(/\s+/g, ' ');
+    }
+
+    function isAnswerCorrect(userAnswer, q) {
+      const correct = q.answer;
+      const normalizedUser = normalizeAnswer(userAnswer);
+      if (Array.isArray(correct)) {
+        return correct.some((a) => normalizeAnswer(String(a)) === normalizedUser);
+      }
+      return normalizedUser === normalizeAnswer(String(correct));
+    }
+
+    function checkAnswer(userValue) {
+      const rawAnswer = userValue !== undefined ? String(userValue) : answerInput.value;
+      const userAnswer = normalizeAnswer(rawAnswer);
+      const q = questions[currentIndex];
+
+      if (!userAnswer) return;
+
+      if (isAnswerCorrect(rawAnswer, q)) {
+        successFeedback();
+        if (q.options && q.options.length > 0) {
+          optionsContainer.classList.remove('visible');
+          const expl = q.explanation || '';
+          optionExplanation.textContent = expl;
+          optionExplanation.style.display = expl ? 'block' : 'none';
+          optionFeedback.classList.add('visible');
+        } else {
+          advanceAfterCorrect();
+        }
+        saveState();
+      } else {
+        errorCount++;
+        const banMinutes = errorCount * 5;
+        applyBan(banMinutes);
+        saveState();
+      }
+    }
+
+    function advanceAfterCorrect() {
+      errorCount = 0;
+      if (currentIndex < questions.length - 1) {
+        currentIndex++;
+        showNextQuestion();
+        answerInput.value = '';
+      } else {
+        showCongrats();
+      }
+      saveState();
+    }
+
+    function successFeedback() {
+      if (navigator.vibrate) {
+        navigator.vibrate([50, 30, 50]);
+      }
+    }
+
+    function updateQuestionImage() {
+      const q = questions[currentIndex];
+      if (q.image) {
+        questionImageWrap.classList.remove('hidden');
+        questionImageLoader.classList.remove('hidden');
+        questionImage.alt = q.question;
+        questionImage.style.visibility = 'hidden';
+        questionImage.onload = function() {
+          questionImageLoader.classList.add('hidden');
+          questionImage.style.visibility = 'visible';
+        };
+        questionImage.onerror = function() {
+          questionImageLoader.classList.add('hidden');
+        };
+        questionImage.src = q.image;
+        preloadNextImage();
+      } else {
+        questionImageWrap.classList.add('hidden');
+        questionImage.src = '';
+      }
+    }
+
+    function preloadNextImage() {
+      const nextIndex = currentIndex + 1;
+      if (nextIndex < questions.length && questions[nextIndex].image) {
+        const img = new Image();
+        img.src = questions[nextIndex].image;
+      }
+    }
+
+    function updateQuestionUI() {
+      const q = questions[currentIndex];
+      optionFeedback.classList.remove('visible');
+      if (q.options && q.options.length > 0) {
+        inputGroup.style.display = 'none';
+        optionsContainer.classList.add('visible');
+        optionsContainer.innerHTML = '';
+        q.options.forEach((opt) => {
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'option-btn';
+          btn.textContent = opt;
+          btn.addEventListener('click', () => checkAnswer(opt));
+          optionsContainer.appendChild(btn);
+        });
+      } else {
+        inputGroup.style.display = 'flex';
+        optionsContainer.classList.remove('visible');
+        optionsContainer.innerHTML = '';
+      }
+    }
+
+    function showNextQuestion() {
+      questionText.style.opacity = '0';
+      setTimeout(() => {
+        questionText.textContent = questions[currentIndex].question;
+        updateQuestionImage();
+        updateQuestionUI();
+        questionText.style.opacity = '1';
+      }, 150);
+
+      quizCounter.innerHTML = `❤️ Вопрос ${currentIndex + 1}/<span id="totalQuestions">${questions.length}</span>`;
+      updateProgress();
+    }
+
+    function updateProgress() {
+      const percent = (currentIndex / questions.length) * 100;
+      progressFill.style.width = percent + '%';
+    }
+
+    function applyBan(banMinutes) {
+      const banMs = banMinutes * 60 * 1000;
+      banEndTime = Date.now() + banMs;
+
+      answerInput.disabled = true;
+      submitBtn.disabled = true;
+      optionsContainer.querySelectorAll('.option-btn').forEach((b) => { b.disabled = true; });
+      banTimer.classList.add('visible');
+
+      updateBanDisplay();
+
+      if (banTimerInterval) clearInterval(banTimerInterval);
+      banTimerInterval = setInterval(tickBan, 1000);
+    }
+
+    function tickBan() {
+      const remaining = Math.max(0, Math.ceil((banEndTime - Date.now()) / 1000));
+
+      if (remaining <= 0) {
+        clearBan();
+        return;
+      }
+
+      updateBanDisplay();
+    }
+
+    function updateBanDisplay() {
+      const remaining = Math.max(0, Math.ceil((banEndTime - Date.now()) / 1000));
+      const mins = Math.floor(remaining / 60);
+      const secs = remaining % 60;
+      banTimeEl.textContent = String(mins).padStart(2, '0') + ':' + String(secs).padStart(2, '0');
+    }
+
+    function clearBan() {
+      if (banTimerInterval) {
+        clearInterval(banTimerInterval);
+        banTimerInterval = null;
+      }
+      banEndTime = null;
+      answerInput.disabled = false;
+      submitBtn.disabled = false;
+      optionsContainer.querySelectorAll('.option-btn').forEach((b) => { b.disabled = false; });
+      banTimer.classList.remove('visible');
+      saveState();
+    }
+
+    function showCongrats() {
+      successFeedback();
+      quizScreen.style.display = 'none';
+      congratsScreen.classList.add('visible');
+      createConfetti();
+      saveState();
+    }
+
+    function createConfetti() {
+      const container = document.getElementById('confetti');
+      const colors = ['#ffb6c1', '#ff69b4', '#e6e6fa', '#ffdab9', '#98fb98', '#ffa07a'];
+      const count = 50;
+
+      for (let i = 0; i < count; i++) {
+        const piece = document.createElement('div');
+        piece.className = 'confetti-piece';
+        piece.style.left = Math.random() * 100 + '%';
+        piece.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+        piece.style.animationDelay = Math.random() * 0.5 + 's';
+        piece.style.animationDuration = (2 + Math.random() * 2) + 's';
+        container.appendChild(piece);
+
+        setTimeout(() => piece.remove(), 4000);
+      }
+    }
+
+    function initQuizDisplay() {
+      questionText.textContent = questions[currentIndex].question;
+      updateQuestionImage();
+      updateQuestionUI();
+      quizCounter.innerHTML = `❤️ Вопрос ${currentIndex + 1}/<span id="totalQuestions">${questions.length}</span>`;
+      updateProgress();
+    }
+
+    function showQuiz() {
+      document.getElementById('startScreen').classList.add('hidden');
+      quizScreen.style.display = 'flex';
+      initQuizDisplay();
+      if (banEndTime && banEndTime > Date.now()) {
+        answerInput.disabled = true;
+        submitBtn.disabled = true;
+        optionsContainer.querySelectorAll('.option-btn').forEach((b) => { b.disabled = true; });
+        banTimer.classList.add('visible');
+        updateBanDisplay();
+        banTimerInterval = setInterval(tickBan, 1000);
+      }
+      saveState();
+    }
+
+    function init() {
+      const startScreen = document.getElementById('startScreen');
+      const startStep1 = document.getElementById('startStep1');
+      const startStep2 = document.getElementById('startStep2');
+      const giftBtn = document.getElementById('giftBtn');
+      const quizStartBtn = document.getElementById('quizStartBtn');
+
+      giftBtn.addEventListener('click', () => {
+        startStep1.classList.remove('visible');
+        startStep2.classList.add('visible');
+      });
+
+      quizStartBtn.addEventListener('click', () => {
+        showQuiz();
+      });
+
+      const state = loadState();
+
+      if (state && state.completed) {
+        startScreen.classList.add('hidden');
+        quizScreen.style.display = 'none';
+        congratsScreen.classList.add('visible');
+      } else {
+        startScreen.classList.remove('hidden');
+        startStep1.classList.add('visible');
+        startStep2.classList.remove('visible');
+        quizScreen.style.display = 'none';
+      }
+
+      submitBtn.addEventListener('click', checkAnswer);
+      answerInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter' && !answerInput.disabled) {
+          checkAnswer();
+        }
+      });
+      optionContinueBtn.addEventListener('click', () => {
+        optionFeedback.classList.remove('visible');
+        advanceAfterCorrect();
+      });
+    }
+
+    init();
+  </script>
+</body>
+</html>
