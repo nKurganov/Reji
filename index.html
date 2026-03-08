@@ -737,7 +737,6 @@
         options: ["Чехия", "Польша", "Словакия", "Венгрия"],
         explanation: ""
       },
-      { question: "Сколько планет в Солнечной системе?", answer: "8" },
       {
         question: "Какой химический элемент обозначается символом Fe?",
         answer: "Железо",
@@ -750,7 +749,6 @@
         options: ["Достоевский", "Толстой", "Булгаков", "Гоголь"],
         explanation: ""
       },
-      { question: "В каком году пала Берлинская стена?", answer: "1989" },
       {
         question: "Какой газ преобладает в атмосфере Земли?",
         answer: "Азот",
@@ -763,7 +761,6 @@
         options: ["Манго", "Дуриан", "Папайя", "Рамбутан"],
         explanation: ""
       },
-      { question: "Сколько континентов на Земле?", answer: "6" },
       {
         question: "В какой стране изобрели бумагу?",
         answer: "Китай",
@@ -782,7 +779,6 @@
         options: ["Атлантический", "Индийский", "Тихий", "Северный Ледовитый"],
         explanation: ""
       },
-      { question: "Сколько букв в русском алфавите?", answer: "33" },
       {
         question: "В какой стране находится Тадж-Махал?",
         answer: "Индия",
@@ -925,8 +921,7 @@
         saveState();
       } else {
         errorCount++;
-        const banMinutes = errorCount * 1;
-        applyBan(banMinutes);
+        applyBan();
         saveState();
       }
     }
@@ -1019,7 +1014,8 @@
       progressFill.style.width = percent + '%';
     }
 
-    function applyBan(banMinutes) {
+    function applyBan() {
+      const banMinutes = errorCount;
       const banMs = (TEST_BAN_SECONDS != null ? TEST_BAN_SECONDS : banMinutes * 60) * 1000;
       banEndTime = Date.now() + banMs;
 
