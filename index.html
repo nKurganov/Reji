@@ -118,6 +118,25 @@
       opacity: 0.9;
     }
 
+    .reset-btn {
+      display: block;
+      margin: 0.6rem auto 0;
+      padding: 0.4rem 0.8rem;
+      font-family: var(--font-body);
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--text);
+      background: none;
+      border: 1px solid rgba(92, 74, 74, 0.25);
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .reset-btn:hover {
+      color: #c71585;
+      border-color: var(--rose);
+    }
+
     .progress-bar {
       width: 100%;
       height: 10px;
@@ -606,9 +625,10 @@
 
     <div class="quiz-screen" id="quizScreen" style="display: none;">
       <div class="quiz-header">
-        <p class="greeting">Реджи, с 8 марта! 💐</p>
+        <p class="greeting">Регина, с 8 марта! 💐</p>
         <p class="subtitle">Ответь на вопросики</p>
         <div class="quiz-counter" id="quizCounter">❤️ Вопрос 1/<span id="totalQuestions">10</span></div>
+        <button type="button" class="reset-btn" id="resetBtn">Сбросить прогресс</button>
       </div>
 
       <div class="progress-bar">
@@ -661,7 +681,11 @@
     const TEST_BAN_SECONDS = 10;
 
     const questions = [
-      { question: "Подпольное прозвище у Олеськи?", answer: ["Сосо", "Coco", "сосо"], image: "soso.jpg" },
+      { question: "Подпольное прозвище у Олеськи?",
+       answer: "Coco",
+       options: ["Лэся", "Пэпэ", "Сосо", "Сосиска"],
+       image: "soso.jpg" 
+      },
       {
         question: "Какой продукт, по оценкам историков, иногда использовали как плату в Древнем Риме, что стало основой для одного современного слова?",
         answer: "Соль",
@@ -769,31 +793,43 @@
     }
 
     function normalizeAnswer(str) {
-      let s = str.trim().toLowerCase().replace(/\s+/g, ' ');
-      s = replaceLatinHomoglyphs(s);
+      let s = String(str).trim().toLowerCase().replace(/\s+/g, ' ');
+      s = s.replace(/[\u200B-\u200D\uFEFF\u00AD]/g, '');
+      s = replaceHomoglyphs(s);
       return s;
     }
 
-    function replaceLatinHomoglyphs(str) {
-      const latToCyr = {
+    function replaceHomoglyphs(str) {
+      const toCyrillic = {
         'a': '\u0430', 'c': '\u0441', 'e': '\u0435', 'o': '\u043e', 'p': '\u0440',
-        'x': '\u0445', 'y': '\u0443', 'ё': '\u0435'
+        'x': '\u0445', 'y': '\u0443', 's': '\u0441',
+        '\u0451': '\u0435',
+        '\u03bf': '\u043e'
       };
       let result = '';
       for (let i = 0; i < str.length; i++) {
         const c = str[i];
-        result += latToCyr[c] !== undefined ? latToCyr[c] : c;
+        result += toCyrillic[c] !== undefined ? toCyrillic[c] : c;
       }
       return result;
+    }
+
+    function lettersOnly(str) {
+      return str.replace(/[^а-яёa-z]/gi, '');
     }
 
     function isAnswerCorrect(userAnswer, q) {
       const correct = q.answer;
       const normalizedUser = normalizeAnswer(userAnswer);
-      if (Array.isArray(correct)) {
-        return correct.some((a) => normalizeAnswer(String(a)) === normalizedUser);
-      }
-      return normalizedUser === normalizeAnswer(String(correct));
+      const normalizedCorrect = Array.isArray(correct)
+        ? correct.map((a) => normalizeAnswer(String(a)))
+        : [normalizeAnswer(String(correct))];
+      const userLetters = lettersOnly(normalizedUser);
+      return normalizedCorrect.some((c) => {
+        if (c === normalizedUser) return true;
+        if (userLetters && lettersOnly(c) === userLetters) return true;
+        return false;
+      });
     }
 
     function checkAnswer(userValue) {
@@ -1045,10 +1081,15 @@
         optionFeedback.classList.remove('visible');
         advanceAfterCorrect();
       });
+      document.getElementById('resetBtn').addEventListener('click', () => {
+        try {
+          localStorage.removeItem(STORAGE_KEY);
+          location.reload();
+        } catch (e) {}
+      });
     }
 
     init();
   </script>
 </body>
 </html>
-
