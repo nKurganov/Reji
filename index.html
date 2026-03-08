@@ -118,25 +118,6 @@
       opacity: 0.9;
     }
 
-    .reset-btn {
-      display: block;
-      margin: 0.6rem auto 0;
-      padding: 0.4rem 0.8rem;
-      font-family: var(--font-body);
-      font-size: 0.8rem;
-      font-weight: 500;
-      color: var(--text);
-      background: none;
-      border: 1px solid rgba(92, 74, 74, 0.25);
-      border-radius: 8px;
-      cursor: pointer;
-    }
-
-    .reset-btn:hover {
-      color: #c71585;
-      border-color: var(--rose);
-    }
-
     .progress-bar {
       width: 100%;
       height: 10px;
@@ -628,7 +609,6 @@
         <p class="greeting">Регина, с 8 марта! 💐</p>
         <p class="subtitle">Ответь на вопросики</p>
         <div class="quiz-counter" id="quizCounter">❤️ Вопрос 1/<span id="totalQuestions">10</span></div>
-        <button type="button" class="reset-btn" id="resetBtn">Сбросить прогресс</button>
       </div>
 
       <div class="progress-bar">
@@ -669,7 +649,7 @@
       <div class="congrats-content">
         <div class="congrats-emoji">🎉🌸💝</div>
         <h2 class="congrats-title">Дорогая, с праздником тебя!</h2>
-        <a href="https://ya.ru/" class="gift-link" id="giftLink" target="_blank" rel="noopener">
+        <a href="https://ga.gift/ru/5ea2bf4e05db47b6ae7cb6880b3cdc5f" class="gift-link" id="giftLink" target="_blank" rel="noopener">
           🎁 Получить подарок
         </a>
       </div>
@@ -678,7 +658,7 @@
 
   <script>
     const STORAGE_KEY = 'quiz8marta';
-    const TEST_BAN_SECONDS = 10;
+    const TEST_BAN_SECONDS = null;
 
     const questions = [
       { question: "Подпольное прозвище у Олеськи?",
@@ -1104,12 +1084,6 @@
       optionContinueBtn.addEventListener('click', () => {
         optionFeedback.classList.remove('visible');
         advanceAfterCorrect();
-      });
-      document.getElementById('resetBtn').addEventListener('click', () => {
-        try {
-          localStorage.removeItem(STORAGE_KEY);
-          location.reload();
-        } catch (e) {}
       });
     }
 
